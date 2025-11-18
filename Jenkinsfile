@@ -1,27 +1,50 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE = "alidevops8/hello-devops:latest"
+    }
+
     stages {
-        stage('Build') {
+        
+        stage('Checkout') {
             steps {
-                sh 'docker build -t ghcr.io/alidevops8/hello-devops:latest .'
+                checkout scm
             }
         }
 
-        stage('Push') {
+        stage('Build Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'ghcr', usernameVariable: 'USR', passwordVariable: 'PWD')]) {
-                    sh 'echo $PWD | docker login ghcr.io -u $USR --password-stdin'
+                sh """
+                docker build -t $IMAGE ./app
+                """
+            }
+        }
+        
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    docker push $IMAGE
+                    """
                 }
-                sh 'docker push ghcr.io/alidevops8/hello-devops:latest'
             }
         }
 
-        stage('GitOps Sync') {
+        stage('Notify ArgoCD') {
             steps {
-                sh 'echo "Trigger ArgoCD sync (optional webhook)"'
+                echo "Trigger ArgoCD will be added later"
             }
         }
     }
-}
 
+    post {
+        success {
+            echo "🚀 Build complete and pushed to Docker Hub!"
+        }
+        failure {
+            echo "❌ Pipeline failed"
+        }
+    }
+}
