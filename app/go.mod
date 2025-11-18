@@ -1,0 +1,6 @@
+module hello-devops
+
+go 1.23
+
+require github.com/prometheus/client_golang v1.23.2
+
