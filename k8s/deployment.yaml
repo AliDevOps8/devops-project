@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: hello-app
+  namespace: hello-devops
 spec:
   replicas: 1
   selector:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
       - name: hello
-        image: ghcr.io/alidevops8/hello-devops:latest
+        image: alidevops8/hello-devops:latest
         ports:
         - containerPort: 8080
 
