@@ -41,8 +41,10 @@ pipeline {
                     sed -i '' "s%${IMAGE_NAME}:.*%${IMAGE_NAME}:${IMAGE_TAG}%g" ./k8s/deployment.yaml
                     git config user.email "ali.devops8@gmail.com"
                     git config user.name "alidevops8"
+                    git branch -M main
+                    git remote add origin git@github.com:AliDevOps8/devops-project.git
                     git commit -am "Update image version to ${IMAGE_TAG}"
-                    git push origin main
+                    git push -u origin main
                     """
                 }
             }
