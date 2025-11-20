@@ -42,7 +42,7 @@ pipeline {
                     git config user.email "ali.devops8@gmail.com"
                     git config user.name "alidevops8"
                     git commit -am "Update image version to ${IMAGE_TAG}"
-                    git push
+                    git push origin main
                     """
                 }
             }
