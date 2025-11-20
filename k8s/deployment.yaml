@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: hello
-        image: alidevops8/hello-devops:0d716ef
+        image: alidevops8/hello-devops:f19f2fc
         ports:
         - containerPort: 8080
 
