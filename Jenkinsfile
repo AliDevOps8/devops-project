@@ -2,11 +2,13 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "alidevops8/hello-devops:latest"
+        IMAGE_NAME = "alidevops8/hello-devops"
+        IMAGE_TAG = "${env.GIT_COMMIT.take(7)}"
+        IMAGE = "${IMAGE_NAME}:${IMAGE_TAG}"
     }
 
     stages {
-        
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -20,7 +22,7 @@ pipeline {
                 """
             }
         }
-        
+
         stage('Push Docker Image') {
             steps {
                 withDockerRegistry(credentialsId: 'dockerhub', url: "") {
@@ -31,19 +33,37 @@ pipeline {
             }
         }
 
-        stage('Notify ArgoCD') {
+        stage('Update GitOps Repo') {
             steps {
-                echo "Trigger ArgoCD will be added later"
+                sshagent(credentials: ['github-token']) {
+                    sh """
+                    git clone git@github.com:AliDevOps8/devops-project.git
+                    cd devops-project
+                    
+                    sed -i "s|${IMAGE_NAME}:.*|${IMAGE}|g" k8s/deployment.yaml
+                    cat deployment.yaml
+                    git config user.email "ali.devops8@gmail.com"
+                    git config user.name "alidevops8"
+                    git commit -am "Update image version to ${IMAGE_TAG}"
+                    git push
+                    """
+                }
+            }
+        }
+
+        stage('Notify ArgoCD (optional)') {
+            steps {
+                echo "ArgoCD will detect Git changes automatically!"
             }
         }
     }
 
     post {
         success {
-            echo "🚀 Build complete and pushed to Docker Hub!"
+            echo "🚀 CI/CD + GitOps pipeline completed. ArgoCD will sync soon."
         }
         failure {
-            echo "❌ Pipeline failed"
+            echo "❌ Pipeline failed!"
         }
     }
 }
