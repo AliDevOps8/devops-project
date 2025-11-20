@@ -38,6 +38,7 @@ pipeline {
                 sshagent(credentials: ['github-token']) {
                     sh """
                     git clone git@github.com:AliDevOps8/devops-project.git
+                    git checkout main
                     sed -i '' "s%${IMAGE_NAME}:.*%${IMAGE_NAME}:${IMAGE_TAG}%g" ./k8s/deployment.yaml
                     git config user.email "ali.devops8@gmail.com"
                     git config user.name "alidevops8"
