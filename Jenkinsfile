@@ -39,7 +39,6 @@ pipeline {
                     sh """
                     git clone git@github.com:AliDevOps8/devops-project.git
                     sed -i "s|${IMAGE_NAME}:.*|${IMAGE}|g" k8s/deployment.yaml
-                    cat deployment.yaml
                     git config user.email "ali.devops8@gmail.com"
                     git config user.name "alidevops8"
                     git commit -am "Update image version to ${IMAGE_TAG}"
